@@ -9,7 +9,9 @@ var port = process.env.PORT || 3000
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
 var cors = require('cors');
-app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 204
+app.use(cors({
+  optionsSuccessStatus: 200
+})); // some legacy browsers choke on 204
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
@@ -21,16 +23,31 @@ app.get("/", function (req, res) {
 
 
 // your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+app.get("/api/:date", function (req, res) {
+  let date = req.params.date;
+  if (date.match(/\d{5,}/)) {
+    date = +date;
+  }
+  let dateString = new Date(date)
+  if (dateString.toUTCString() == "Invalid Date") {
+    res.json({
+      error: "Invalid Date"
+    })
+  }
+  res.json({
+    unix: dateString.valueOf(),
+    utc: dateString.toUTCString()
+  });
 });
 
-app.get("/api/:date_string", function (req, res) {
-let dateString = req.params.date_string;
-  console.log(dateString);
-  // res.json({"error": 'Invalid date'});
-});
+app.get("/api", function (req, res) {
+  let dateString = new Date();
 
+  res.json({
+    unix: dateString.valueOf(),
+    utc: dateString.toUTCString()
+  });
+});
 
 
 // listen for requests :)
